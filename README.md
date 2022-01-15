@@ -118,4 +118,4 @@ If you *don't* use zsh-syntax-highlighting, you should check it out. It's great.
 
 # hey why don't you just write better commit messages
 
-Okay yeah look I'm using `git commit -m` as an example a lot, but zsh-autoquoter was originally written so I could add notes and todo list items from the command line more easily. Not to say that `git commit -m` is *bad* -- it's great if you're using a [patch queue workflow](https://github.com/mystor/git-revise). But zsh-autoquoter isn't an excuse to write vague commit messages.
+Okay yeah look I'm using `git commit -m` as an example a lot, but zsh-autoquoter was originally written so I could add notes and todo list items from the command line more easily. Not to say that `git commit -m` is *bad* -- it's great if you're using a [patch queue workflow](https://github.com/mystor/git-revise). But zsh-autoquoter does not condone vague one-line commit messages.
