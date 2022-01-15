@@ -82,7 +82,7 @@ ZAQ_PREFIXES=('git commit -m' 'git commit -am')
 ## [Antigen](https://github.com/zsh-users/antigen):
 
 ```
-$ antigen bundle ianthehenry/sd
+$ antigen bundle ianthehenry/zsh-autoquoter
 ```
 
 ## [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh):
