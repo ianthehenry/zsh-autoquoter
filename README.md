@@ -66,7 +66,7 @@ I recommend enabling syntax highlighting (see below) to make it obvious when zsh
 
 ## History
 
-Commands will be rewritten *before* they're added to history, so your `~/.zsh_ _history` will reflect an accurate list of commands you *ran*, not commands you *typed*. But because zsh-autoquoter ignores already-quoted entries, you can always up-enter and re-run the same command.
+Commands will be rewritten *before* they're added to history, so your `~/.zsh_history` will reflect an accurate list of commands you *ran*, not commands you *typed*. But because zsh-autoquoter ignores already-quoted entries, you can always up-enter and re-run the same command.
 
 # Installation
 
