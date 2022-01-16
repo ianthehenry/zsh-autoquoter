@@ -60,7 +60,7 @@ autoquote() {
     smart_single_quoted=${(q+)args}
     double_quoted=${(qqq)args}
 
-    if [[ ${#smart_single_quoted} -lt ${#double_quoted} ]]; then
+    if [[ $#smart_single_quoted -lt $#double_quoted ]]; then
       BUFFER="$command$smart_single_quoted"
     else
       BUFFER="$command$double_quoted"
