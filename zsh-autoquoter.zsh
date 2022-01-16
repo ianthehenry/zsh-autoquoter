@@ -65,7 +65,6 @@ autoquote() {
     else
       BUFFER="$command$double_quoted"
     fi
-    zle -R
   fi
 
   zle .accept-line
