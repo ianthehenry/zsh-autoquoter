@@ -72,10 +72,10 @@ Commands will be rewritten *before* they're added to history, so your `~/.zsh_hi
 
 ## Manually
 
-Download `autoquote.zsh` and source from your `~/.zshrc` file. Then make sure that you add some prefixes to your `~/.zshrc`:
+Download `zsh-autoquoter.zsh` and source it from your `~/.zshrc` file. Then make sure that you add some prefixes:
 
 ```zsh
-source ~/src/zsh-autoquoter/autoquoter.zsh
+source ~/src/zsh-autoquoter/zsh-autoquoter.zsh
 ZAQ_PREFIXES=('git commit -m' 'git commit -am')
 ```
 
@@ -93,7 +93,7 @@ Clone this repo into your custom plugins directory:
 $ git clone https://github.com/ianthehenry/zsh-autoquoter.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autoquoter
 ```
 
-And then add it to the plugins list in your `~/.zshrc` *before* you source `oh-my-zsh`:
+And then add it to the plugins list in your `~/.zshrc` before you source `oh-my-zsh`:
 
 ```
 plugins+=(zsh-autoquoter)
