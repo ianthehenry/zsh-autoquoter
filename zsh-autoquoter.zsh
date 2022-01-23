@@ -76,6 +76,12 @@ _zsh_highlight_highlighter_zaq_predicate() {
   _zsh_highlight_buffer_modified
 }
 
+# if ZSH_HIGHLIGHT_STYLES has not already been declared,
+# the substitution-assignment will be a syntax error.
+if [[ ${(t)ZSH_HIGHLIGHT_STYLES} != 'association' ]]; then
+  declare -gA ZSH_HIGHLIGHT_STYLES
+fi
+
 : ${ZSH_HIGHLIGHT_STYLES[zaq:string]:=fg=yellow,underline}
 
 _zsh_highlight_highlighter_zaq_paint() {
