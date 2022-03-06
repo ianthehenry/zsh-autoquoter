@@ -1,10 +1,16 @@
 declare -a ZAQ_PREFIXES=()
 
+_zaq_count_args() {
+  echo $#
+}
+
 _zaq_check_prefix() {
+  setopt LOCAL_OPTIONS
+  setopt EXTENDED_GLOB
   local prefix input stripped leading_quote expected_ending_quote
   prefix=$1
   input=$2
-  stripped=${input#"$prefix "}
+  stripped=${input#$~prefix }
   if [[ "$input" = "$stripped" ]]; then
     return 1
   fi
@@ -19,10 +25,20 @@ _zaq_check_prefix() {
   if [[ "$leading_quote" ]]; then
     expected_ending_quote="${leading_quote#$}"
     if [[ "${(M)stripped%$expected_ending_quote}" ]]; then
-      return 1
+      # We've checked that we start and end with a quote, but we could still
+      # be in a case like this:
+      #
+      #   git commit -m "fix" the "bug"
+      #
+      # So, finally, we check that the arguments to be quoted actually evaluates
+      # to a single word.
+      if [[ $(_zaq_count_args ${(z)stripped}) = 1 ]]; then
+        return 1
+      fi
     fi
   fi
 
+  echo $(( $#input - $#stripped ))
   return 0
 }
 
@@ -30,8 +46,6 @@ _zaq_prefix_length() {
   local prefix
   for prefix in $ZAQ_PREFIXES; do
     if _zaq_check_prefix "$prefix" "$1"; then
-      # add one for the space after it
-      echo $(( $#prefix + 1 ))
       return 0
     fi
   done

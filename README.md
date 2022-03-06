@@ -20,25 +20,49 @@ And let zsh-autoquoter do the rest.
 Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` array in your `~/.zshrc`:
 
 ```zsh
-ZAQ_PREFIXES=('git commit -m' 'note' 'todo')
+ZAQ_PREFIXES=("git commit #* -*m" "ssh *")
 ```
 
 **By default this array is empty.** You need to opt into autoquote behavior.
 
-Note that `ZAQ_PREFIXES` is an array of exact string prefixes: they are sensitive to whitespace, and zsh-autoquoter has no understanding of commands or flags or other shell syntax. If you have `"git commit -m"` as a prefix, and you type:
+`ZAQ_PREFIXES` is an array of *shell patterns* that will be matched against your input. Shell patterns are kind of goofy, but the above patterns can be understood by example. For example, the first one matches all of these strings:
 
-```zsh
-$ git commit -a -m hi hello
+```
+git commit -a -m hi hello
+                 ^^^^^^^^
+
+git commit -am hi hello
+               ^^^^^^^^
+
+
+git commit -m hi hello
+            ^^^^^^^^
 ```
 
-Then zsh-autoquoter *will not fire*, even though you probably want it to. A future version of zsh-autoquoter might have an option to parse commands more intelligently, but it currently does not.
+And the second matches complex commands like this:
+
+    ssh user@host some 'complex' * | remote <"command"
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+(A pattern that ends in an asterisk matches a single positional argument, because zsh-autoquoter always adds an implicit space to the end of your patterns, and searches for the shortest matching prefix.)
+
+To get very specific, you can debug a pattern using the following expression:
+
+    setopt EXTENDED_GLOB
+    input="ssh user@host some command"
+    prefix="ssh *"
+    print ${input#$~prefix }
+
+Which is exactly how zsh-autoquoter is implemented. If that prints the entire `input` string, your pattern didn't work. If it only prints a subset of it, then that is the subset that will be autoquoted.
+
+See section [14.8.1 Glob Operators](https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators) of the ZSH guide for help on writing patterns.
 
 ## Special characters
 
 zsh-autoquoter runs before your shell has a chance to expand or glob or parse the command you typed, so it works to quote any shell syntax:
 
 ```
-$ git commit -m * globs and | pipes and > redirects and # comments oh my
+$ ssh user@host * globs and | pipes and > redirects and # comments oh my
 ```
 
 There is one exception:
@@ -57,16 +81,18 @@ When doing this check, zsh-autoquoter will look for a *fully quoted* argument st
 
 ```
 $ git commit -m 'twas the night before christmas
-$ git commit -m "fix" the latest bug
+$ git commit -m "fix" the latest "bug"
 ```
 
 And it will be autoquoted correctly.
 
-I recommend enabling syntax highlighting (see below) to make it obvious when zsh-autoquoter is going to fire and when it is not.
+I *highly* recommend enabling syntax highlighting (see below) to make it obvious when zsh-autoquoter is going to fire and when it is not.
 
 ## History
 
 Commands will be rewritten *before* they're added to history, so your `~/.zsh_history` will reflect an accurate list of commands you *ran*, not commands you *typed*. But because zsh-autoquoter ignores already-quoted entries, you can always up-enter and re-run the same command.
+
+Yes, you could imagine wanting it the other way, but I just cannot figure out how to make that work with zsh.
 
 # Installation
 
