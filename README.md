@@ -36,7 +36,7 @@ git commit -am hi hello
 
 
 git commit -m hi hello
-            ^^^^^^^^
+              ^^^^^^^^
 ```
 
 And the second matches complex commands like this:
