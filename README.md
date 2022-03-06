@@ -15,6 +15,8 @@ $ git commit -m we haven't seen the last of this "feature"
 
 And let zsh-autoquoter do the rest.
 
+And if you use [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), it'll even highlight these "autoquoted strings" distinctly, so you'll never be surprised when zsh-autoquoter fires.
+
 # Behavior
 
 Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` array in your `~/.zshrc`:
