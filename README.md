@@ -22,42 +22,59 @@ And if you use [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax
 Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` array in your `~/.zshrc`:
 
 ```zsh
-ZAQ_PREFIXES=("git commit #* -*m" "ssh *")
+ZAQ_PREFIXES=('git commit -m' 'ssh *')
 ```
 
 **By default this array is empty.** You need to opt into autoquote behavior.
 
-`ZAQ_PREFIXES` is an array of *shell patterns* that will be matched against your input. Shell patterns are kind of goofy, but the above patterns can be understood by example. For example, the first one matches all of these strings:
+`ZAQ_PREFIXES` is an array of *shell patterns* that will be matched against your input.
+
+Shell patterns are kind of like goofy regular expressions, where `*` means `.*` and `#` means `*` and `##` means `+`. So while `git commit -m` would work as a pattern to match a literal prefix, I would suggest this more flexible alternative:
+
+```zsh
+ZAQ_PREFIXES+=('git commit( [^ ]##)# -[^ -]#m')
+```
 
 ```
 git commit -a -m hi hello
                  ^^^^^^^^
-
 git commit -am hi hello
                ^^^^^^^^
-
-
 git commit -m hi hello
               ^^^^^^^^
 ```
 
-And the second matches complex commands like this:
+And while `ssh *` will "skip one argument" and then quote the rest, you should probably use a pattern that allows flags and triggers after the first positional argument:
 
-    ssh user@host some 'complex' * | remote <"command"
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```zsh
+ZAQ_PREFIXES+=('ssh( [^ ]##)# [^ -][^ ]#')
+```
 
-(A pattern that ends in an asterisk matches a single positional argument, because zsh-autoquoter always adds an implicit space to the end of your patterns, and searches for the shortest matching prefix.)
+```
+ssh -Y user@host some 'complex' * | remote <"command"
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
 
-To get very specific, you can debug a pattern using the following expression:
+## Writing patterns
+
+Wow those are complicated, huh? Yeah. And they're not even very complete: for example, you can't type:
+
+    ssh 'some hostname with a space in it' something
+
+Because the pattern doesn't recognize that `'some hostname with a space in it'` is a single positional argument. Patterns operate on *characters*, even though we think about command arguments in terms of *words*. But parsing those out would be a whole thing.
+
+Note that `[^ -][^ ]#` at the end of a pattern matches exactly one positional argument because zsh-autoquoter always adds an implicit space to the end of your patterns, and searches for the shortest matching prefix.
+
+You can debug a pattern using the following expression:
 
     setopt EXTENDED_GLOB
-    input="ssh user@host some command"
-    prefix="ssh *"
+    input='ssh user@host some command'
+    prefix='ssh( [^ ]##)# [^ -][^ ]#'
     print ${input#$~prefix }
 
 Which is exactly how zsh-autoquoter is implemented. If that prints the entire `input` string, your pattern didn't work. If it only prints a subset of it, then that is the subset that will be autoquoted.
 
-See section [14.8.1 Glob Operators](https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators) of the ZSH guide for help on writing patterns.
+See section [14.8.1 Glob Operators](https://zsh.sourceforge.io/Doc/Release/Expansion.html#Glob-Operators) for a more thorough description of pattern syntax.
 
 ## Special characters
 
