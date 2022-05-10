@@ -17,6 +17,8 @@ And let zsh-autoquoter do the rest.
 
 And if you use [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), it'll even highlight these "autoquoted strings" distinctly, so you'll never be surprised when zsh-autoquoter fires.
 
+[Check out this blog post for a fancy asciinema demo of zsh-autquoter in action.](https://ianthehenry.com/posts/zsh-autoquoter/)
+
 # Behavior
 
 Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` array in your `~/.zshrc`:
@@ -121,7 +123,9 @@ Download `zsh-autoquoter.zsh` and source it from your `~/.zshrc` file. Then make
 
 ```zsh
 source ~/src/zsh-autoquoter/zsh-autoquoter.zsh
-ZAQ_PREFIXES=('git commit -m' 'git commit -am')
+ZAQ_PREFIXES=('git commit( [^ ]##)# -[^ -]#m' 'ssh( [^ ]##)# [^ -][^ ]#')
+# If using zsh-syntax-highlighting:
+# ZSH_HIGHLIGHT_HIGHLIGHTERS+=(zaq)
 ```
 
 ## [Antigen](https://github.com/zsh-users/antigen):
@@ -163,4 +167,6 @@ If you *don't* use zsh-syntax-highlighting, you should check it out. It's great.
 
 # hey why don't you just write better commit messages
 
-Okay yeah look I'm using `git commit -m` as an example a lot, but zsh-autoquoter was originally written so I could add notes and todo list items from the command line more easily. Not to say that `git commit -m` is *bad* -- it's great if you're using a [patch queue workflow](https://github.com/mystor/git-revise). But zsh-autoquoter does not condone vague one-line commit messages.
+Okay yeah look I'm using `git commit -m` as an example a lot, but I actually wrote zsh-autoquoter so that I could add notes and todo list items from the command line more easily.
+
+Not to say that `git commit -m` is *bad* -- it's great if you're using a [patch queue workflow](https://github.com/mystor/git-revise). But zsh-autoquoter does not condone vague one-line commit messages.
