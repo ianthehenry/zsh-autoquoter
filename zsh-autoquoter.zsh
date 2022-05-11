@@ -1,4 +1,4 @@
-declare -a ZAQ_PREFIXES=()
+declare -ga ZAQ_PREFIXES
 
 _zaq_count_args() {
   echo $#
