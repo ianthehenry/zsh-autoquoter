@@ -21,15 +21,16 @@ And if you use [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax
 
 # Behavior
 
-Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` array in your `~/.zshrc`:
+Configure command prefixes that you want to be autoquoted by setting the `ZAQ_PREFIXES` or `ZAQ_PREFIXES_GREEDY` arrays in your `~/.zshrc`:
 
 ```zsh
 ZAQ_PREFIXES=('git commit -m' 'ssh *')
+ZAQ_PREFIXES_GREEDY=()
 ```
 
-**By default this array is empty.** You need to opt into autoquote behavior.
+**By default these arrays are empty.** You need to opt into autoquote behavior.
 
-`ZAQ_PREFIXES` is an array of *shell patterns* that will be matched against your input.
+`ZAQ_PREFIXES` and `ZAQ_PREFIXES_GREEDY` are arrays of *shell patterns* that will be matched against your input.
 
 Shell patterns are kind of like goofy regular expressions, where `*` means `.*` and `#` means `*` and `##` means `+`. So while `git commit -m` would work as a pattern to match a literal prefix, I would suggest this more flexible alternative:
 
@@ -49,13 +50,26 @@ git commit -m hi hello
 And while `ssh *` will "skip one argument" and then quote the rest, you should probably use a pattern that allows flags and triggers after the first positional argument:
 
 ```zsh
-ZAQ_PREFIXES+=('ssh( [^ ]##)# [^ -][^ ]#')
+ZAQ_PREFIXES+=('ssh( -[^ ]##)# [^ -][^ ]#')
 ```
 
 ```
 ssh -Y user@host some 'complex' * | remote <"command"
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ```
+
+`ZAQ_PREFIXES_GREEDY` patterns will match greedily. Since everything *after* the matching pattern will be autoquoted, `ZAQ_PREFIXES_GREEDY` will cause less of your prompt to be autoquoted. You'll probably want to stick with `ZAQ_PREFIXES`, but greedy patterns can be useful for matching a variable number of flags. For example:
+
+```zsh
+ZAQ_PREFIXES_GREEDY=('foo( -[^ ]##)#')
+```
+
+```
+foo -bar -baz hello world
+              ^^^^^^^^^^^
+```
+
+Since `#` means "zero or more," a non-greedy pattern would always match zero repetitions.
 
 ## Writing patterns
 
@@ -65,14 +79,18 @@ Wow those are complicated, huh? Yeah. And they're not even very complete: for ex
 
 Because the pattern doesn't recognize that `'some hostname with a space in it'` is a single positional argument. Patterns operate on *characters*, even though we think about command arguments in terms of *words*. But parsing those out would be a whole thing.
 
-Note that `[^ -][^ ]#` at the end of a pattern matches exactly one positional argument because zsh-autoquoter always adds an implicit space to the end of your patterns, and searches for the shortest matching prefix.
+Note that `[^ -][^ ]#` at the end of a pattern matches exactly one positional argument because zsh-autoquoter always adds an implicit space to the end of your patterns.
 
 You can debug a pattern using the following expression:
 
     setopt EXTENDED_GLOB
     input='ssh user@host some command'
-    prefix='ssh( [^ ]##)# [^ -][^ ]#'
+    prefix='ssh( -[^ ]##)# [^ -][^ ]#'
     print ${input#$~prefix }
+
+Or, for testing greedy patterns:
+
+    print ${input##$~prefix }
 
 Which is exactly how zsh-autoquoter is implemented. If that prints the entire `input` string, your pattern didn't work. If it only prints a subset of it, then that is the subset that will be autoquoted.
 
@@ -123,7 +141,7 @@ Download `zsh-autoquoter.zsh` and source it from your `~/.zshrc` file. Then make
 
 ```zsh
 source ~/src/zsh-autoquoter/zsh-autoquoter.zsh
-ZAQ_PREFIXES=('git commit( [^ ]##)# -[^ -]#m' 'ssh( [^ ]##)# [^ -][^ ]#')
+ZAQ_PREFIXES=('git commit( [^ ]##)# -[^ -]#m' 'ssh( -[^ ]##)# [^ -][^ ]#')
 # If using zsh-syntax-highlighting:
 # ZSH_HIGHLIGHT_HIGHLIGHTERS+=(zaq)
 ```

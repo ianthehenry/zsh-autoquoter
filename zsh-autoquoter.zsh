@@ -1,4 +1,5 @@
 declare -ga ZAQ_PREFIXES
+declare -ga ZAQ_PREFIXES_GREEDY
 
 _zaq_count_args() {
   echo $#
@@ -7,10 +8,16 @@ _zaq_count_args() {
 _zaq_check_prefix() {
   setopt LOCAL_OPTIONS
   setopt EXTENDED_GLOB
-  local prefix input stripped leading_quote expected_ending_quote
+  local prefix input stripped leading_quote expected_ending_quote greedy
   prefix=$1
   input=$2
-  stripped=${input#$~prefix }
+  greedy=$3
+  if [[ $greedy = "true" ]]; then
+    stripped=${input##$~prefix }
+  else
+    stripped=${input#$~prefix }
+  fi
+
   if [[ "$input" = "$stripped" ]]; then
     return 1
   fi
@@ -45,7 +52,13 @@ _zaq_check_prefix() {
 _zaq_prefix_length() {
   local prefix
   for prefix in $ZAQ_PREFIXES; do
-    if _zaq_check_prefix "$prefix" "$1"; then
+    if _zaq_check_prefix "$prefix" "$1" false; then
+      return 0
+    fi
+  done
+
+  for prefix in $ZAQ_PREFIXES_GREEDY; do
+    if _zaq_check_prefix "$prefix" "$1" true; then
       return 0
     fi
   done
